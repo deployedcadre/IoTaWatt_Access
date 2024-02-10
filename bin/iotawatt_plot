@@ -19,8 +19,13 @@ from dateutil.parser import ParserError, parse
 from dateutil.tz import tzlocal
 from requests.exceptions import ConnectionError
 
-from iotawatt_access import (IotaWattAPI, IotaWattData, data_path,
-                             device_login, timestamp_to_datetime)
+from iotawatt_access import (
+    IotaWattAPI,
+    IotaWattData,
+    data_path,
+    device_login,
+    timestamp_to_datetime,
+)
 
 
 def date_from_day_arg(dayarg):
@@ -102,7 +107,7 @@ if __name__ == "__main__":
     if os.path.isfile(data_filename):  # Load data file if it exists
         print(f"Loading saved data for {day.strftime('%Y-%m-%d')}")
         iwd = IotaWattData.load(data_filename)
-    else: # Otherwise download the data from the device
+    else:  # Otherwise download the data from the device
         # Initialize connection to device
         url, user, pwd = device_login()
         try:

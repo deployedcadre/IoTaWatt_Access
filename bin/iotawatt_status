@@ -10,8 +10,13 @@ import sys
 
 from requests.exceptions import ConnectionError
 
-from iotawatt_access import (IotaWattAPI, device_login, dict_list_to_str,
-                             dict_to_str, timestamp_to_str)
+from iotawatt_access import (
+    IotaWattAPI,
+    device_login,
+    dict_list_to_str,
+    dict_to_str,
+    timestamp_to_str,
+)
 
 if __name__ == "__main__":
     # Parse command line arguments.

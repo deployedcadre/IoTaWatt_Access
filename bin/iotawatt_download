@@ -13,8 +13,13 @@ import sys
 from dateutil.rrule import DAILY, rrule
 from requests.exceptions import ConnectionError
 
-from iotawatt_access import (IotaWattAPI, data_path, device_login,
-                             str_to_datetime, timestamp_to_str)
+from iotawatt_access import (
+    IotaWattAPI,
+    data_path,
+    device_login,
+    str_to_datetime,
+    timestamp_to_str,
+)
 
 if __name__ == "__main__":
     # Parse command line arguments.
