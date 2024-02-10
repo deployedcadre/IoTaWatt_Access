@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (C) 2020-2024 by Brendt Wohlberg
+# All rights reserved. GPL v2 License.
+
+# Download logged data from an IotaWatt device.
+
+import argparse
+import datetime
+import os
+import sys
+
+from dateutil.rrule import DAILY, rrule
+from requests.exceptions import ConnectionError
+
+from iotawatt_access import (IotaWattAPI, data_path, device_login,
+                             str_to_datetime, timestamp_to_str)
+
+if __name__ == "__main__":
+    # Parse command line arguments.
+    argprs = argparse.ArgumentParser(
+        prog="iotawatt_download",
+        description="""Download logged data from an IotaWatt device. The
+        download starts with the first logged date that has not yet been
+        downloaded, and continues to the day before the current day. The
+        device URL is determined by environment varable IOTAWATT_URL if
+        set, with a default value of "http://iotawatt.local". Device
+        username and password are determined by environment varables
+        IOTAWATT_USERNAME and IOTAWATT_PASSWORD respectively, with default
+        values of "admin" and None respectively. Data is saved in a
+        directory determined by environment varable IOTAWATT_DATA_PATH,
+        with a default of "~/IotaWatt_Data".""",
+    )
+    args = argprs.parse_args()
+
+    # Get data path and exit with an error if path does not exist
+    dpath = data_path()
+    if not os.path.isdir(dpath):
+        print(f"{dpath} does not exist or is not a directory.")
+        sys.exit(1)
+
+    # Initialize connection to device
+    url, user, pwd = device_login()
+    try:
+        iw = IotaWattAPI(url=url, user=user, pwd=pwd)
+    except ConnectionError as e:
+        print(f"Error connecting to {url} using password {pwd}")
+        sys.exit(2)
+
+    # Get start and end times for "current" logs as strings
+    stdl = iw.get_status("datalogs")
+    curr = [l for l in stdl if l["id"] == "Current"][0]
+    begin = timestamp_to_str(curr["firstkey"])[:-6]
+    end = timestamp_to_str(curr["lastkey"])[:-6]
+
+    # Construct datetime representations of download begin and end times
+    dt0 = str_to_datetime(begin)
+    dt1 = str_to_datetime(end[0:10] + begin[10:])  # end date with begin time
+
+    # Define callback function indicating download progress
+    def callback(*arg):
+        print(".", end="", flush=True)
+
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    print("Downloading data")
+    # Iterate over day-long intervals between begin and end times
+    for n, dt in enumerate(rrule(DAILY, dtstart=dt0, until=dt1)):
+        isodate = dt.strftime("%Y-%m-%d")
+        if isodate == today:  # avoid partial day download
+            break
+        fname = os.path.join(dpath, f"iotawatt_{isodate}.npz")
+        if os.path.exists(fname):
+            continue
+        print(isodate, end=" ")
+        # Construct begin and end times for current day download. Download
+        # starting from the full log begin date/time if downloading the data
+        # for the first logged day. Otherwise download for a full day.
+        if n == 0:
+            t0 = dt0.isoformat()
+        else:
+            t0 = isodate + "T00:00:00"
+        t1 = isodate + "T23:59:59"
+        # Get logged data for current date/time range and save it
+        iwd = iw.get_channel_data(t0, t1, callback=callback)
+        iwd.save(fname)
+        print("\r" + " " * 60 + "\r", end="", flush=True)
+
+    sys.exit(0)

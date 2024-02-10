@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (C) 2024 by Brendt Wohlberg
+# All rights reserved. GPL v2 License.
+
+# Get status information from IotaWatt device.
+
+import argparse
+import sys
+
+from requests.exceptions import ConnectionError
+
+from iotawatt_access import (IotaWattAPI, device_login, dict_list_to_str,
+                             dict_to_str, timestamp_to_str)
+
+if __name__ == "__main__":
+    # Parse command line arguments.
+    argprs = argparse.ArgumentParser(
+        prog="iotawatt_status",
+        description="Get status information from an IotaWatt device.",
+    )
+    argprs.add_argument(
+        "-v", "--vinput", action="store_true", help="display voltage input information."
+    )
+    argprs.add_argument(
+        "-o", "--outputs", action="store_true", help="display outputs information."
+    )
+    argprs.add_argument(
+        "-w", "--wifi", action="store_true", help="display WiFi status."
+    )
+    argprs.add_argument(
+        "-s", "--stats", action="store_true", help="display stats information."
+    )
+    args = argprs.parse_args()
+
+    # Initialize connection to device
+    url, user, pwd = device_login()
+    try:
+        iw = IotaWattAPI(url=url, user=user, pwd=pwd)
+    except ConnectionError as e:
+        print(f"Error connecting to {url} using password {pwd}")
+        sys.exit(1)
+
+    # Utility function for converting UNIX timestamps to dates in string form
+    ts2str = lambda ts: timestamp_to_str(ts, notz=True)
+
+    # Get and print "datalogs" status information
+    slog = iw.get_status(stype="datalogs")
+    print("Datalogs:")
+    print(
+        dict_list_to_str(
+            slog,
+            fmt={"size": "11d", "interval": "3d"},
+            cnv={"firstkey": ts2str, "lastkey": ts2str},
+        )
+    )
+
+    # Get channel names and "input" status information and replace channel
+    # numbers with names in the status dict
+    ci = iw.get_channel_info()
+    cn = [c["name"] for c in ci]
+    sin = iw.get_status(stype="inputs")
+    for n, c in enumerate(sin):
+        sin[n]["channel"] = cn[c["channel"]]
+
+    # Print voltage input (assumed to be channel 0) information if requested
+    if args.vinput:
+        print("Voltage Input:")
+        print(dict_list_to_str(sin[0:1]))
+
+    # Print power input information
+    print("Power Input:")
+    print(
+        dict_list_to_str(
+            sin[1:],
+            fmt={"Watts": "4d", "Pf": ".2f", "phase": ".1f"},
+            cnv={"Watts": int},
+        )
+    )
+
+    # Get and print "outputs" status information if requested
+    if args.outputs:
+        sout = iw.get_status(stype="outputs")
+        print("Outputs:")
+        print(dict_list_to_str(sout, fmt={"value": ".0f"}))
+
+    # Get and print "wifi" status information if requested
+    if args.wifi:
+        swifi = iw.get_status(stype="wifi")
+        print("WiFi:")
+        print(dict_to_str(swifi, cnv={"connecttime": ts2str}))
+
+    # Get and print "stats" status information if requested
+    if args.stats:
+        sstat = iw.get_status(stype="stats")
+        print("Stats:")
+        print(dict_to_str(sstat, cnv={"starttime": ts2str, "currenttime": ts2str}))
+
+    sys.exit(0)

@@ -1,0 +1,5 @@
+sphinx > 6.0
+sphinxcontrib-napoleon
+sphinx-autodoc-typehints
+furo
+

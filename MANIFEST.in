@@ -1,0 +1,10 @@
+include MANIFEST.in
+include setup.py
+include pytest.ini
+include README.rst
+include LICENSE
+include requirements.txt
+
+recursive-include bin *.py
+recursive-include docs Makefile requirements.txt *.py *.rst *.css
+recursive-exclude */build *

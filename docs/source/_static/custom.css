@@ -1,0 +1,19 @@
+/* furo theme customization */
+
+.sidebar-drawer {
+  width: fit-content !important;
+}
+
+.main > .content {
+  min-width: 75%;
+  width: fit-content !important;
+  max-width: 80em;
+}
+
+.sidebar-brand-text {
+  font-size: 1.0rem !important;
+  text-align: center;
+  padding-top: 0.5em;
+}
+
+
