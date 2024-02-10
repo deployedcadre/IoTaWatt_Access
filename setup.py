@@ -35,7 +35,7 @@ setup(
     scripts=["bin/iotawatt_download", "bin/iotawatt_plot", "bin/iotawatt_status"],
     python_requires=">= 3.3",
     setup_requires=[],
-    install_requires=["dateutil", "requests", "numpy", "matplotlib"],
+    install_requires=["python-dateutil", "requests", "numpy", "matplotlib"],
     extras_require={
         "tests": ["pytest"],
         "docs": [
