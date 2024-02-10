@@ -19,23 +19,23 @@ Requirements
 ------------
 
 This package requires Python 3.3 or later. The requirements for use of the package
-and associated utility scripts are listed in the `requirements.txt` file in the
+and associated utility scripts are listed in the ``requirements.txt`` file in the
 repository root directory. Additional requirements for building the documents are
-listed in the file `docs/requirements.txt`. The `pytest` package is required to run
-the tests.
+listed in the file ``docs/requirements.txt``. The ``pytest`` package is required
+to run the tests.
 
 
 Usage
 -----
 
-Aside from providing useful functionality, the utility scripts included in the `bin`
-directory also serve as usage examples for the `iotatwatt_access` module.
+Aside from providing useful functionality, the utility scripts included in the
+``bin`` directory also serve as usage examples for the ``iotatwatt_access`` module.
 
 
 Documentation
 -------------
 
-Documentation may be built using the `Makefile` in the `docs` directory.
+Documentation may be built using the ``Makefile`` in the ``docs`` directory.
 
 
 Contact
