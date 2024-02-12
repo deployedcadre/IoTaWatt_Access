@@ -39,7 +39,8 @@ Aside from providing useful functionality, the utility scripts included in the
 Documentation
 -------------
 
-Documentation may be built using the ``Makefile`` in the ``docs`` directory.
+Documentation is available `online <https://iotawatt-access.readthedocs.io/>`_, and
+may be built using the ``Makefile`` in the ``docs`` directory.
 
 
 Contact
