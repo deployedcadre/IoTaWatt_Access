@@ -12,6 +12,7 @@
 #
 import os
 import sys
+from ast import parse
 sys.path.insert(0, os.path.abspath('../..'))
 
 
@@ -21,8 +22,11 @@ project = 'IoTaWatt_Access'
 copyright = '2020-2024, Brendt Wohlberg'
 author = 'Brendt Wohlberg'
 
-# The full version, including alpha/beta/rc tags
-release = '0.0.1'
+with open('../../iotawatt_access.py') as f:
+    version = parse(next(filter(
+        lambda line: line.startswith('__version__'),
+        f))).body[0].value.s
+release = version
 
 
 # -- General configuration ---------------------------------------------------
