@@ -5,6 +5,10 @@ IoTaWatt_Access
     :target: https://github.com/deployedcadre/IoTaWatt_Access
     :alt: Supported Python Versions
 
+.. image:: https://readthedocs.org/projects/iotawatt-access/badge/?version=latest
+    :target: https://iotawatt-access.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
 
 IoTaWatt_Access provides a Python interface to the
 `query API <https://docs.iotawatt.com/en/master/query.html>`_ of the
