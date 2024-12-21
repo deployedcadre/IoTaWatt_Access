@@ -454,6 +454,7 @@ class IotaWattAPI:
         if self.debug:
             self._debug_write("REQUEST\n%s\n" % req)
 
+        response = None
         for reqtry in range(retry):
             jsonfail = False
             try:
@@ -484,6 +485,8 @@ class IotaWattAPI:
             raise RuntimeError(
                 "Maximum number of retries exceeded (%d tries)" % (reqtry + 1)
             )
+        if response is None:
+            raise RunTimeError("Unrecognized failure")
         if response.status_code != 200:
             raise ConnectionError("Connection error code %d" % response.status_code)
         if jsonfail:
