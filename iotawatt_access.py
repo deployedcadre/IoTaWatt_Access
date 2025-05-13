@@ -486,7 +486,7 @@ class IotaWattAPI:
                 "Maximum number of retries exceeded (%d tries)" % (reqtry + 1)
             )
         if response is None:
-            raise RunTimeError("Unrecognized failure")
+            raise RuntimeError("Unrecognized failure")
         if response.status_code != 200:
             raise ConnectionError("Connection error code %d" % response.status_code)
         if jsonfail:
