@@ -36,7 +36,21 @@ if __name__ == "__main__":
         directory determined by environment varable IOTAWATT_DATA_PATH,
         with a default of "~/IotaWatt_Data".""",
     )
+    argprs.add_argument(
+        "-r",
+        "--retry",
+        nargs=1,
+        default=["3"],
+        help="number of times to retry on communications error.",
+    )
     args = argprs.parse_args()
+
+    # Parse retry argument and exit with an error if parsing fails
+    try:
+        retry = int(args.retry[0])
+    except ValueError as e:
+        print(e.args[0])
+        sys.exit(1)
 
     # Get data path and exit with an error if path does not exist
     dpath = data_path()
@@ -53,7 +67,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     # Get start and end times for "current" logs as strings
-    stdl = iw.get_status("datalogs")
+    stdl = iw.get_status("datalogs", retry=retry)
     curr = [l for l in stdl if l["id"] == "Current"][0]
     begin = timestamp_to_str(curr["firstkey"])[:-6]
     end = timestamp_to_str(curr["lastkey"])[:-6]
@@ -86,7 +100,7 @@ if __name__ == "__main__":
             t0 = isodate + "T00:00:00"
         t1 = isodate + "T23:59:59"
         # Get logged data for current date/time range and save it
-        iwd = iw.get_channel_data(t0, t1, callback=callback)
+        iwd = iw.get_channel_data(t0, t1, retry=retry, callback=callback)
         iwd.save(fname)
         print("\r" + " " * 60 + "\r", end="", flush=True)
 

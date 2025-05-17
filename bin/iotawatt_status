@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2024 by Brendt Wohlberg
+# Copyright (C) 2024-2025 by Brendt Wohlberg
 # All rights reserved. GPL v2 License.
 
 # Get status information from IotaWatt device.
@@ -36,7 +36,21 @@ if __name__ == "__main__":
     argprs.add_argument(
         "-s", "--stats", action="store_true", help="display stats information."
     )
+    argprs.add_argument(
+        "-r",
+        "--retry",
+        nargs=1,
+        default=["3"],
+        help="number of times to retry on communications error.",
+    )
     args = argprs.parse_args()
+
+    # Convert retry argument to int exit with an error if conversion fails
+    try:
+        retry = int(args.retry[0])
+    except ValueError as e:
+        print(e.args[0])
+        sys.exit(1)
 
     # Initialize connection to device
     url, user, pwd = device_login()
@@ -50,7 +64,7 @@ if __name__ == "__main__":
     ts2str = lambda ts: timestamp_to_str(ts, notz=True)
 
     # Get and print "datalogs" status information
-    slog = iw.get_status(stype="datalogs")
+    slog = iw.get_status(stype="datalogs", retry=retry)
     print("Datalogs:")
     print(
         dict_list_to_str(
@@ -64,7 +78,7 @@ if __name__ == "__main__":
     # numbers with names in the status dict
     ci = iw.get_channel_info()
     cn = [c["name"] for c in ci]
-    sin = iw.get_status(stype="inputs")
+    sin = iw.get_status(stype="inputs", retry=retry)
     for n, c in enumerate(sin):
         sin[n]["channel"] = cn[c["channel"]]
 
@@ -85,19 +99,19 @@ if __name__ == "__main__":
 
     # Get and print "outputs" status information if requested
     if args.outputs:
-        sout = iw.get_status(stype="outputs")
+        sout = iw.get_status(stype="outputs", retry=retry)
         print("Outputs:")
         print(dict_list_to_str(sout, fmt={"value": ".0f"}))
 
     # Get and print "wifi" status information if requested
     if args.wifi:
-        swifi = iw.get_status(stype="wifi")
+        swifi = iw.get_status(stype="wifi", retry=retry)
         print("WiFi:")
         print(dict_to_str(swifi, cnv={"connecttime": ts2str}))
 
     # Get and print "stats" status information if requested
     if args.stats:
-        sstat = iw.get_status(stype="stats")
+        sstat = iw.get_status(stype="stats", retry=retry)
         print("Stats:")
         print(dict_to_str(sstat, cnv={"starttime": ts2str, "currenttime": ts2str}))
 
