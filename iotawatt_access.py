@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2020-2024 by Brendt Wohlberg
+# Copyright (C) 2020-2025 by Brendt Wohlberg
 # All rights reserved. GPL v2 License.
 
 """Classes for accessing IotaWatt status and data via the Query API."""
@@ -25,7 +25,7 @@ def device_login():
     Return device URL, username, and password from environment variables
     "IOTAWATT_URL", "IOTAWATT_USERNAME", and "IOTAWATT_PASSWORD"
     respectively. If not set, return defaults values
-    "http://iotawatt.local", "admin", and``None`` respectively.
+    "http://iotawatt.local", "admin", and ``None`` respectively.
     """
     if "IOTAWATT_URL" in os.environ:
         url = os.environ["IOTAWATT_URL"]
@@ -60,12 +60,12 @@ def str_to_datetime(timestr, utc=False):
     """Convert a string specifying a date and time into a datetime object.
 
     Args:
-        timestr (str): String specifying a date and time
+        timestr (str): String specifying a date and time.
         utc (bool, optional): Flag indicating whether default time zone
-          should be set to UTC
+          should be set to UTC.
 
     Returns:
-        datetime: A datetime object representation of the date/time
+        datetime: A datetime object representation of the date/time.
     """
     dt = parse(timestr)
     if dt.tzinfo is None:
@@ -80,12 +80,12 @@ def str_to_timestamp(timestr, utc=False):
     """Convert a string specifying a date and time into a Unix timestamp.
 
     Args:
-        timestr (str): String specifying a date and time
+        timestr (str): String specifying a date and time.
         utc (bool, optional): Flag indicating whether default time zone
-          should be set to UTC
+          should be set to UTC.
 
     Returns:
-        int: Unix timestamp representation of the date/time
+        int: Unix timestamp representation of the date/time.
     """
     return str_to_datetime(timestr, utc=utc).timestamp()
 
@@ -94,12 +94,12 @@ def timestamp_to_datetime(ts, utc=False):
     """Convert a Unix timestamp into a datetime object.
 
     Args:
-        ts (int): Unix timestamp
+        ts (int): Unix timestamp.
         utc (bool, optional): Flag indicating whether time zone should
           remain as UTC or be converted to local time.
 
     Returns:
-        datetime: A datetime object representation of the date/time
+        datetime: A datetime object representation of the date/time.
     """
     if utc:
         dt = datetime.fromtimestamp(ts, tz=tzutc())
@@ -116,10 +116,10 @@ def timestamp_to_str(ts, utc=False, notz=False):
         utc (bool, optional): Flag indicating whether time zone should
           remain as UTC or be converted to local time.
         notz (bool, optional): Flag indicating whether the time zone
-          should be included in the returned string
+          should be included in the returned string.
 
     Returns:
-        string: ISO format string representation of the date/time
+        string: ISO format string representation of the date/time.
     """
     dt = timestamp_to_datetime(ts, utc=utc)
     if notz:
@@ -131,12 +131,12 @@ def _list_check(lst, rowlen):
     """Check that all rows in a nested list have the required length.
 
     Args:
-        lst (list): List of lists
-        rowlen (int): Expected length of each inner list
+        lst (list): List of lists.
+        rowlen (int): Expected length of each inner list.
 
     Returns:
-        None or int: None if all rows have required length, otherwise
-           index of first row with incorrect length
+        ``None`` or int: ``None`` if all rows have required length,
+           otherwise index of first row with incorrect length.
     """
     ret = None
     for n, row in enumerate(lst):
@@ -245,11 +245,11 @@ class IotaWattAPI:
     """Access IotaWatt status and recorded data via the Query API.
 
     Attributes:
-        auth (HTTPDigestAuth): Authentication for access to Query API
-        channels (list): List of IotaWatt channel names
-        inputs (list): List of IotaWatt input channel names
-        outputs (list): List of IotaWatt output channel names
-        url (str): URL for access to Query API
+        auth (HTTPDigestAuth): Authentication for access to Query API.
+        channels (list): List of IotaWatt channel names.
+        inputs (list): List of IotaWatt input channel names.
+        outputs (list): List of IotaWatt output channel names.
+        url (str): URL for access to Query API.
     """
 
     def __init__(
@@ -263,9 +263,9 @@ class IotaWattAPI:
         """Initialize IotaWattAPI object.
 
         Args:
-            url (str, optional): IotaWatt device URL
-            user (str, optional): IotaWatt API username
-            pwd (None, optional): IotaWatt API password
+            url (str, optional): IotaWatt device URL.
+            user (str, optional): IotaWatt API username.
+            pwd (None, optional): IotaWatt API password.
         """
         self.url = url
         if self.url[-1] != "/":
@@ -288,13 +288,13 @@ class IotaWattAPI:
         self.outputs = self.channels[-numout:]
 
     def get_channel_info(self, retry=3):
-        """Get details of IotaWatt device input and output channels
+        """Get details of IotaWatt device input and output channels.
 
         Args:
-            retry (int, optional): Number of retries allowed
+            retry (int, optional): Number of retries allowed.
 
         Returns:
-            list of dict: Channel details
+            list of dict: Channel details.
         """
         return self._query("query?show=series", retry=retry)["series"]
 
@@ -304,11 +304,11 @@ class IotaWattAPI:
         Valid values for stype: inputs, outputs, wifi, stats, datalogs
 
         Args:
-            stype (str, optional): Status type
-            retry (int, optional): Number of retries allowed
+            stype (str, optional): Status type.
+            retry (int, optional): Number of retries allowed.
 
         Returns:
-            dict or list of dict: Status details
+            dict or list of dict: Status details.
         """
 
         json = self._query("status?" + stype, retry=retry)
@@ -323,20 +323,20 @@ class IotaWattAPI:
         """Get recorded data from IotaWatt device.
 
         Args:
-            begin (str): Start date/time of channel data
-            end (str): End date/time of channel data
-            channels (list or None, optional): List of current/power
-              channel names. If None, download all of them.
+            begin (str): Start date/time of channel data.
+            end (str): End date/time of channel data.
+            channels (list or ``None``, optional): List of current/power
+              channel names. If ``None``, download all of them.
             interval (int, optional): Sampling interval in seconds (must
-              be a multiple of 5)
+              be a multiple of 5).
             frcdig (int, optional): Number of fractional digits in
-              numeric values
-            retry (int, optional): Number of retries allowed
-            callback (func or None, optional): Callback function
-              supporting data download progress monitoring
+              numeric values.
+            retry (int, optional): Number of retries allowed.
+            callback (func or ``None``, optional): Callback function
+              supporting data download progress monitoring.
 
         Returns:
-            IotaWattData: Channel data and metadata
+            IotaWattData: Channel data and metadata.
         """
         if channels is None:
             channels = self.i_inputs
@@ -439,16 +439,16 @@ class IotaWattAPI:
         """Send query via device API and get response.
 
         Args:
-            query (str): Query string
-            retry (int, optional): Number of retries allowed
+            query (str): Query string.
+            retry (int, optional): Number of retries allowed.
 
         Returns:
-            dict: JSON formatted response
+            dict: JSON formatted response.
 
         Raises:
-            ConnectionError: Error in connecting to device
+            ConnectionError: Error in connecting to device.
             RuntimeError: Maxumum retries exceeded, or error in parsing
-                device response
+                device response.
         """
         req = self.url + query
         if self.debug:
@@ -504,7 +504,7 @@ class IotaWattAPI:
         """Write a transaction log for debugging purposes.
 
         Args:
-            text (str): Text to add to transaction log
+            text (str): Text to add to transaction log.
         """
         f = open(self.dbgfile, "a+")
         f.write(text)
@@ -515,14 +515,14 @@ class IotaWattData:
     """Dataset downloaded from IotaWatt device.
 
     Attributes:
-        begin (str): Start date/time of channel data
-        vchannels (list): List of voltage channel names
-        ichannels (list): List of current/power channel names
-        data (numpy array): Array of channel data
-        end (str): End date/time of channel data
-        frcdig (int): Number of fractional digits in numeric values
-        time (numpy array): Array of sample times as Unix timestamps
-        units (str): Units for channel data
+        begin (str): Start date/time of channel data.
+        vchannels (list): List of voltage channel names.
+        ichannels (list): List of current/power channel names.
+        data (numpy array): Array of channel data.
+        end (str): End date/time of channel data.
+        frcdig (int): Number of fractional digits in numeric values.
+        time (numpy array): Array of sample times as Unix timestamps.
+        units (str): Units for channel data.
     """
 
     def __init__(
@@ -531,14 +531,17 @@ class IotaWattData:
         """Initialize IotaWattData object.
 
         Args:
-            begin (str): Start date/time of channel data
-            end (str): End date/time of channel data
-            vchannels (list): List of voltage channel names
-            ichannels (list): List of current/power channel names
-            frcdig (int): Number of fractional digits in numeric values
-            cols (list or None, optional): List of data column descriptions
-            data (numpy array or None, optional): Array of channel data
-            time (numpy array or None, optional): Array of sample times
+            begin (str): Start date/time of channel data.
+            end (str): End date/time of channel data.
+            vchannels (list): List of voltage channel names.
+            ichannels (list): List of current/power channel names.
+            frcdig (int): Number of fractional digits in numeric values.
+            cols (list or ``None``, optional): List of data column
+              descriptions.
+            data (numpy array or ``None``, optional): Array of channel
+              data.
+            time (numpy array or ``None``, optional): Array of sample
+              times.
         """
         self.begin = begin
         self.end = end
@@ -557,10 +560,13 @@ class IotaWattData:
         """Get data from channel `name` in units `units`.
 
         Args:
-            name (str): Channel name
+            name (str): Channel name.
             units (str): Data units. Valid values are 'volts' and 'hertz'
               for voltage channels and 'watts', 'amps', 'wh', 'va', 'var',
               'varh', 'pf' for current/power channels.
+
+        Returns:
+            numpy array: Channel data.
         """
         if name not in self.vchannels and name not in self.ichannels:
             raise ValueError("No data for channel %s" % name)
@@ -602,7 +608,7 @@ class IotaWattData:
         """Save data in numpy NPZ format.
 
         Args:
-            filename (str): Filename
+            filename (str): Filename.
         """
         np.savez(
             filename,
@@ -621,10 +627,10 @@ class IotaWattData:
         """Load data from numpy NPZ format file.
 
         Args:
-            filename (str): Filename
+            filename (str): Filename.
 
         Returns:
-            IotaWattData : Object data retrieved from file
+            IotaWattData : Object data retrieved from file.
         """
         npz = np.load(filename)
         return cls(
