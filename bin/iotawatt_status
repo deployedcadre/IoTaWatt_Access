@@ -92,8 +92,8 @@ if __name__ == "__main__":
     print(
         dict_list_to_str(
             sin[1:],
-            fmt={"Watts": "4d", "Pf": ".2f", "phase": ".1f"},
-            cnv={"Watts": int},
+            fmt={"Watts": "5d", "Pf": ".2f", "phase": ".1f"},
+            cnv={"Watts": int, "Pf": abs},
         )
     )
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     if args.outputs:
         sout = iw.get_status(stype="outputs", retry=retry)
         print("Outputs:")
-        print(dict_list_to_str(sout, fmt={"value": ".0f"}))
+        print(dict_list_to_str(sout, fmt={"value": "5.0f"}))
 
     # Get and print "wifi" status information if requested
     if args.wifi:
