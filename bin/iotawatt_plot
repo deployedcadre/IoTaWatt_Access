@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2024 by Brendt Wohlberg
+# Copyright (C) 2024-2025 by Brendt Wohlberg
 # All rights reserved. GPL v2 License.
 
 # Plot one day of logged data from an IotaWatt device.
