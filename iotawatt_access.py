@@ -549,12 +549,17 @@ class IotaWattData:
         self.ichannels = ichannels
         self.frcdig = frcdig
         self.cols = cols
-        if time is None and data is not None:
-            self.time = data[:, 0].astype(int)
-            self.data = data[:, 1:].astype(np.float32)
-        else:
+        if data is not None and time is not None:
             self.time = time
             self.data = data
+        else:
+            if data is None:
+                self.time = np.zeros((0,), dtype=int)
+                self.data = np.zeros((0, len(cols)), dtype=np.float32)
+            else:
+                self.time = data[:, 0].astype(int)
+                self.data = data[:, 1:].astype(np.float32)
+
 
     def get_channel_data(self, name, units):
         """Get data from channel `name` in units `units`.
