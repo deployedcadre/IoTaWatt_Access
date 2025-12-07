@@ -88,7 +88,7 @@ if __name__ == "__main__":
         if isodate == today:  # avoid partial day download
             break
         fname = os.path.join(dpath, f"iotawatt_{isodate}.npz")
-        if os.path.exists(fname):
+        if os.path.isfile(fname) and os.path.getsize(fname) > 0:
             continue
         print(isodate, end=" ")
         # Construct begin and end times for current day download. Download
