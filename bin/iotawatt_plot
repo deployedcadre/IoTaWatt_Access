@@ -156,6 +156,11 @@ if __name__ == "__main__":
         print("At least one channel number is out of range.")
         sys.exit(5)
 
+    # Check for zero-length data
+    if iwd.data.shape[0] == 0:
+        print("No channel data for specified date.")
+        sys.exit(6)
+
     # Construct list of names of selected channels and array of corresponding data
     chnname = []
     chndata = []
