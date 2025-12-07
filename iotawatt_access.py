@@ -549,7 +549,7 @@ class IotaWattData:
         self.ichannels = ichannels
         self.frcdig = frcdig
         self.cols = cols
-        if time is None:
+        if time is None and data is not None:
             self.time = data[:, 0].astype(int)
             self.data = data[:, 1:].astype(np.float32)
         else:
