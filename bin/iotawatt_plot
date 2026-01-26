@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2024-2025 by Brendt Wohlberg
+# Copyright (C) 2024-2026 by Brendt Wohlberg
 # All rights reserved. GPL v2 License.
 
 # Plot one day of logged data from an IotaWatt device.
@@ -75,6 +75,9 @@ if __name__ == "__main__":
         default=None,
         help="""comma separated list of channel numbers, with 0 corresponding
         to the first power input.""",
+    )
+    argprs.add_argument(
+        "-f", "--filter", action="store_true", help="filter and downsample x 12."
     )
     args = argprs.parse_args()
 
@@ -174,12 +177,18 @@ if __name__ == "__main__":
     smptim = np.array([timestamp_to_datetime(ts, utc=False) for ts in iwd.time])
 
     # Lowpass filter channel data and subsample it and the sample time array
-    flt = np.ones((12,), dtype=np.float32) / 12.0
-    fltdata = np.zeros(chndata.shape)
-    for n in range(chndata.shape[0]):
-        fltdata[n] = np.convolve(chndata[n], flt, mode="same")
-    fltdata = fltdata[:, ::12]
-    smptim = smptim[::12]
+    if args.filter:
+        # Choice of filter is not ideal, but it avoids the need for an
+        # addtional dependency on scipy
+        flt = np.hamming(12).astype(np.float32)
+        flt /= flt.sum()
+        fltdata = np.zeros(chndata.shape)
+        for n in range(chndata.shape[0]):
+            fltdata[n] = np.convolve(chndata[n], flt, mode="same")
+        fltdata = fltdata[:, ::12]
+        smptim = smptim[::12]
+    else:
+        fltdata = chndata
 
     # Plot selected channels
     fig, ax = plt.subplots(figsize=(16, 10))
